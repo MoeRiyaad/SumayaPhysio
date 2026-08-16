@@ -18,6 +18,7 @@
   const contactForm = document.querySelector("#contactForm");
   if (contactForm) {
     contactForm.setAttribute("action", formSubmitEndpoint);
+	  contactForm.setAttribute("method", "POST"); // enforce POST
   }
 
   /**
