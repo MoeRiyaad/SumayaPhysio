@@ -216,5 +216,31 @@
   }
   window.addEventListener('load', navmenuScrollspy);
   document.addEventListener('scroll', navmenuScrollspy);
+  
+  /**
+   * Email link handler
+   * Opens Gmail on desktop/laptop, default mail app on mobile
+   * Prepopulates subject and body for booking
+   */
+  function openEmail() {
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
+    const subject = encodeURIComponent("Appointment Booking Request");
+    const body = encodeURIComponent("Hello Sumaya Physio,\n\nI would like to book an appointment. Please let me know available times.\n\nThank you.");
+
+    if (isMobile) {
+      window.location.href = `mailto:SumayaBougaard@gmail.com?subject=${subject}&body=${body}`;
+    } else {
+      window.open(`https://mail.google.com/mail/?view=cm&fs=1&to=SumayaBougaard@gmail.com&su=${subject}&body=${body}`, "_blank");
+    }
+  }
+
+  const emailLink = document.querySelector('.email');
+  if (emailLink) {
+    emailLink.addEventListener('click', function(e) {
+      e.preventDefault();
+      openEmail();
+    });
+  }
 
 })();
