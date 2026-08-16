@@ -8,6 +8,17 @@
 
 (function() {
   "use strict";
+   // ... all your existing code above ...
+
+  /**
+   * Set FormSubmit endpoint dynamically
+   */
+  const formSubmitEndpoint = "https://formsubmit.co/24ff2d67bdb9400f946a9e74f6659046";
+
+  const contactForm = document.querySelector("#contactForm");
+  if (contactForm) {
+    contactForm.setAttribute("action", formSubmitEndpoint);
+  }
 
   /**
    * Apply .scrolled class to the body as the page is scrolled down
