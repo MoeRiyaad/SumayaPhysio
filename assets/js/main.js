@@ -9,6 +9,46 @@
 (function() {
   "use strict";
    // ... all your existing code above ...
+   
+   //google revirews
+   document.addEventListener("DOMContentLoaded", function () {
+  const stars = document.querySelectorAll("#starRating i");
+  const hint = document.getElementById("ratingHint");
+  const privateFeedback = document.getElementById("privateFeedback");
+  // PASTE the SAME Google review link here as the href above
+  const GOOGLE_REVIEW_LINK = "https://g.page/r/CervTDgbBLhAEBM/review";
+
+  stars.forEach(star => {
+    star.addEventListener("mouseenter", () => highlight(star.dataset.value));
+    star.addEventListener("mouseleave", () => highlight(0));
+    star.addEventListener("click", () => {
+      const value = parseInt(star.dataset.value);
+      stars.forEach(s => s.classList.toggle("selected", s.dataset.value <= value));
+
+      if (value >= 4) {
+        hint.textContent = "Thanks! Redirecting you to Google...";
+        setTimeout(() => window.open(GOOGLE_REVIEW_LINK, "_blank"), 600);
+      } else {
+        hint.textContent = "Thanks for letting us know.";
+        privateFeedback.style.display = "block";
+        privateFeedback.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
+    });
+  });
+
+  function highlight(value) {
+    stars.forEach(s => s.classList.toggle("hovered", s.dataset.value <= value));
+  }
+
+  document.getElementById("feedbackForm").addEventListener("submit", function (e) {
+    e.preventDefault();
+    // TODO: wire this to your email/backend (e.g. Formspree, EmailJS, or a mailto: fallback)
+    alert("Thank you for your feedback — we'll follow up shortly.");
+    this.reset();
+  });
+});
+
+
 
   /**
    * Set FormSubmit endpoint dynamically
