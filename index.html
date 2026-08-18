@@ -828,7 +828,35 @@ Our mission is to help you regain confidence in your body and get back to doing 
 </footer><!-- /Footer -->
 
  <script>
- 
+ //grey out booked options
+ document.getElementById("preferredDate").addEventListener("change", async function () {
+  const selectedDate = this.value;
+  const timeSelect = document.getElementById("preferredTime");
+  const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxgGwfrD_HOBXan0gF5bDV1bWzWvGHUo6hGLJNMNkFvNGhDYvJAoHMarXYrod1AYEnZLA/exec";
+
+  // Reset all options first (in case user picked a date, then picked another)
+  Array.from(timeSelect.options).forEach(opt => {
+    opt.disabled = false;
+    opt.textContent = opt.textContent.replace(" (Booked)", "");
+  });
+
+  if (!selectedDate) return;
+
+  try {
+    const res = await fetch(`${APPS_SCRIPT_URL}?date=${selectedDate}`);
+    const data = await res.json();
+
+    (data.bookedTimes || []).forEach(bookedTime => {
+      const option = timeSelect.querySelector(`option[value="${bookedTime}"]`);
+      if (option) {
+        option.disabled = true;
+        option.textContent += " (Booked)";
+      }
+    });
+  } catch (err) {
+    console.warn("Could not check availability:", err);
+  }
+});
  //google calendar
 document.getElementById("bookingForm").addEventListener("submit", async function (e) {
   e.preventDefault();
