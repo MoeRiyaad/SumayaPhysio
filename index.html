@@ -611,7 +611,7 @@ Our mission is to help you regain confidence in your body and get back to doing 
                   <label for="userPhone" class="field-label">Phone</label>
                 </div>
               </div>
-              <div class="col-md-6">
+             <div class="col-md-6">
   <div class="form-field">
     <input type="date" name="preferred_date" class="form-input" id="preferredDate" required>
     <label for="preferredDate" class="field-label">Preferred Date</label>
@@ -620,8 +620,21 @@ Our mission is to help you regain confidence in your body and get back to doing 
 
 <div class="col-md-6">
   <div class="form-field">
-    <select name="preferred_time" class="form-input" id="preferredTime" required>
-      <option value="" disabled selected>Select a time</option>
+    <select name="duration" class="form-input" id="treatmentDuration" required>
+      <option value="" disabled selected>Select duration</option>
+      <option value="30">30 minutes</option>
+      <option value="45">45 minutes</option>
+      <option value="60">1 hour</option>
+      <option value="90">1.5 hours</option>
+    </select>
+    <label for="treatmentDuration" class="field-label">Treatment Duration</label>
+  </div>
+</div>
+
+<div class="col-md-6">
+  <div class="form-field">
+    <select name="preferred_time" class="form-input" id="preferredTime" required disabled>
+      <option value="" disabled selected>Select date and duration first</option>
       <option value="08:00">08:00 AM</option>
       <option value="09:00">09:00 AM</option>
       <option value="10:00">10:00 AM</option>
@@ -829,34 +842,59 @@ Our mission is to help you regain confidence in your body and get back to doing 
 
  <script>
  //grey out booked options
- document.getElementById("preferredDate").addEventListener("change", async function () {
-  const selectedDate = this.value;
+ async function checkAvailability() {
+  const selectedDate = document.getElementById("preferredDate").value;
+  const durationValue = document.getElementById("treatmentDuration").value;
   const timeSelect = document.getElementById("preferredTime");
   const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxgGwfrD_HOBXan0gF5bDV1bWzWvGHUo6hGLJNMNkFvNGhDYvJAoHMarXYrod1AYEnZLA/exec";
 
-  // Reset all options first (in case user picked a date, then picked another)
+  if (!selectedDate || !durationValue) {
+    timeSelect.disabled = true;
+    return;
+  }
+
+  const duration = parseInt(durationValue);
+  timeSelect.disabled = false;
+
   Array.from(timeSelect.options).forEach(opt => {
     opt.disabled = false;
     opt.textContent = opt.textContent.replace(" (Booked)", "");
   });
 
-  if (!selectedDate) return;
-
   try {
     const res = await fetch(`${APPS_SCRIPT_URL}?date=${selectedDate}`);
     const data = await res.json();
+    const ranges = data.bookedRanges || [];
 
-    (data.bookedTimes || []).forEach(bookedTime => {
-      const option = timeSelect.querySelector(`option[value="${bookedTime}"]`);
-      if (option) {
-        option.disabled = true;
-        option.textContent += " (Booked)";
+    Array.from(timeSelect.options).forEach(opt => {
+      if (!opt.value) return;
+      const slotStart = toMinutes(opt.value);
+      const slotEnd = slotStart + duration;
+
+      const overlaps = ranges.some(r => {
+        const bookedStart = toMinutes(r.start);
+        const bookedEnd = toMinutes(r.end);
+        return slotStart < bookedEnd && slotEnd > bookedStart;
+      });
+
+      if (overlaps) {
+        opt.disabled = true;
+        opt.textContent += " (Booked)";
       }
     });
   } catch (err) {
     console.warn("Could not check availability:", err);
   }
-});
+}
+
+function toMinutes(hhmm) {
+  const [h, m] = hhmm.split(":").map(Number);
+  return h * 60 + m;
+}
+
+document.getElementById("preferredDate").addEventListener("change", checkAvailability);
+document.getElementById("treatmentDuration").addEventListener("change", checkAvailability);
+
  //google calendar
 document.getElementById("bookingForm").addEventListener("submit", async function (e) {
   e.preventDefault();
