@@ -419,7 +419,7 @@ input:focus, textarea:focus {
     margin-top: 1rem;         /* clear space above heading */
     text-align: center;
   }
-}
+
 
 .header .nav-wrap {
   background-color: color-mix(in srgb, var(--default-color), transparent 92%);
@@ -432,6 +432,7 @@ input:focus, textarea:focus {
   position: fixed;
   top: 20px;
   right: 5px;
+}
 }
 
 /* Global Header on Scroll
@@ -677,6 +678,63 @@ input:focus, textarea:focus {
   }
 }
 
+/* --- Fix logo/tagline overlap --- */
+.header .logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.header .logo .sitename {
+  display: block;
+  line-height: normal;   /* kill the theme's tight single-line height */
+  height: auto;
+  margin: 0;
+}
+
+.header .logo .sitename .text-center {
+  margin-top: 0 !important; /* remove Bootstrap's mt-3, we'll control spacing ourselves */
+}
+
+.sumaya-name {
+  font-size: clamp(1.1rem, 5vw, 1.6rem);
+  line-height: 1.2;
+  margin: 0;
+  white-space: nowrap;
+}
+
+.sumaya-physio {
+  font-size: clamp(0.7rem, 3vw, 0.95rem);
+  line-height: 1.4;
+  letter-spacing: 1px;
+}
+
+/* --- Fix cramped icons/hamburger on small screens --- */
+@media (max-width: 600px) {
+  .top-row {
+    flex-wrap: wrap;
+    row-gap: 8px;
+  }
+
+  .header .social-links {
+    gap: 14px;           /* even spacing instead of squished together */
+    padding-right: 40px;
+  }
+
+  .header .social-links i {
+    font-size: 1.1rem;
+  }
+}
+
+/* --- Fluid scaling for very small phones (below 400px) --- */
+@media (max-width: 400px) {
+  .sumaya-name {
+    font-size: clamp(0.95rem, 6vw, 1.2rem);
+  }
+  .sumaya-physio {
+    font-size: clamp(0.6rem, 3.5vw, 0.8rem);
+  }
+}
 /*--------------------------------------------------------------
 # Global Footer
 --------------------------------------------------------------*/
