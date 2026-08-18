@@ -583,7 +583,7 @@ Our mission is to help you regain confidence in your body and get back to doing 
             <p>Please provide your details and preferred time. Our team will confirm your booking via email.</p>
           </div>
 
-          <form action="https://formsubmit.co/24ff2d67bdb9400f946a9e74f6659046" method="POST" class="php-email-form contact-form">
+          <form id="bookingForm" action="https://formsubmit.co/24ff2d67bdb9400f946a9e74f6659046" method="POST" class="php-email-form contact-form">
             <!-- Redirect back to page with success flag -->
             <input type="hidden" name="_next" value="https://moeriyaad.github.io/SumayaPhysio/#contact">
             <!-- Honeypot + Captcha -->
@@ -656,7 +656,8 @@ Our mission is to help you regain confidence in your body and get back to doing 
               Submit Booking <span class="button-arrow">→</span>
             </button>
           </form>
-        </div>
+        
+		</div>
       </div>
 
       <!-- Contact Sidebar -->
@@ -833,41 +834,54 @@ Our mission is to help you regain confidence in your body and get back to doing 
 document.getElementById("bookingForm").addEventListener("submit", async function (e) {
   e.preventDefault();
 
-  const submitBtn = this.querySelector(".send-button");
-  const originalHTML = submitBtn.innerHTML;
+  const form = this;
+  const loadingEl = form.querySelector(".loading");
+  const errorEl = form.querySelector(".error-message");
+  const sentEl = form.querySelector(".sent-message");
+  const submitBtn = form.querySelector(".send-button");
+
+  [loadingEl, errorEl, sentEl].forEach(el => el.style.display = "none");
+  loadingEl.style.display = "block";
   submitBtn.disabled = true;
-  submitBtn.innerHTML = "Booking...";
 
   const payload = {
-    name: this.querySelector("[name=full_name]").value,
-    email: this.querySelector("[name=email]").value,
-    phone: this.querySelector("[name=phone]").value,
-    date: this.querySelector("[name=preferred_date]").value,
-    time: this.querySelector("[name=preferred_time]").value,
-    notes: this.querySelector("[name=notes]")?.value || ""
+    name: form.querySelector("[name=name]").value,
+    email: form.querySelector("[name=email]").value,
+    phone: form.querySelector("[name=phone]").value,
+    date: form.querySelector("[name=preferred_date]").value,
+    time: form.querySelector("[name=preferred_time]").value,
+    notes: form.querySelector("[name=message]").value
   };
 
   const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyRDJTd5WxjEblAewnCu9n2CcniI9_uhuT_2rGxKsD2daAtnIVnMpQMHo9ZXv93dR4utA/exec";
+  const FORMSUBMIT_AJAX_URL = "https://formsubmit.co/ajax/24ff2d67bdb9400f946a9e74f6659046";
 
   try {
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 5000); // never wait more than 5s
-
-    await fetch(APPS_SCRIPT_URL, {
+    // fire calendar booking, don't let it block the email send
+    fetch(APPS_SCRIPT_URL, {
       method: "POST",
-      mode: "no-cors",           // stops the CORS/redirect hang
+      mode: "no-cors",
       body: JSON.stringify(payload),
-      headers: { "Content-Type": "text/plain" },
-      signal: controller.signal
+      headers: { "Content-Type": "text/plain" }
+    }).catch(err => console.warn("Calendar booking failed:", err));
+
+    const res = await fetch(FORMSUBMIT_AJAX_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Accept": "application/json" },
+      body: JSON.stringify(payload)
     });
 
-    clearTimeout(timeout);
-  } catch (err) {
-    console.warn("Calendar booking failed or timed out, continuing anyway.", err);
-  }
+    if (!res.ok) throw new Error("FormSubmit request failed");
 
-  submitBtn.innerHTML = originalHTML;
-  this.submit(); // now actually continue on to FormSubmit
+    loadingEl.style.display = "none";
+    sentEl.style.display = "block";
+    form.reset();
+  } catch (err) {
+    loadingEl.style.display = "none";
+    errorEl.style.display = "block";
+  } finally {
+    submitBtn.disabled = false;
+  }
 });
 
  
