@@ -553,53 +553,61 @@ input:focus, textarea:focus {
 
 /* Navmenu - Mobile */
 @media (max-width: 1199px) {
-  .mobile-nav-toggle {
-    color: var(--nav-color);
-    font-size: 28px;
-    line-height: 0;
-    margin-right: 10px;
-    cursor: pointer;
-    transition: color 0.3s;
-  }
-
-  .navmenu {
-    padding: 0;
-    z-index: 9997;
-  }
-
   .navmenu ul {
-    display: none;
+    display: block;              /* always in DOM, controlled by transform */
     list-style: none;
-    position: absolute;
-    inset: 60px 20px 20px 20px;
-    padding: 10px 0;
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: min(78vw, 320px);     /* adapts to any phone width, caps on tablets */
+    inset: auto;                 /* override the old inset shorthand */
     margin: 0;
-    border-radius: 6px;
-    background-color: var(--nav-mobile-background-color);
+    padding: 80px 0 20px;
+    border-radius: 0;
+    background-color: #0d1b1e;   /* match your dark header bg */
+    border-left: 1px solid rgba(0, 153, 153, 0.25);
     overflow-y: auto;
-    transition: 0.3s;
+    transform: translateX(100%);
+    transition: transform 0.35s ease;
     z-index: 9998;
-    box-shadow: 0px 0px 30px rgba(0, 0, 0, 0.1);
+    box-shadow: -8px 0 24px rgba(0, 0, 0, 0.35);
+  }
+
+  .mobile-nav-active .navmenu ul {
+    transform: translateX(0);    /* slides in from the right */
+  }
+
+  /* dark overlay behind the panel */
+  .mobile-nav-active .navmenu::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.55);
+    z-index: 9997;
   }
 
   .navmenu a,
   .navmenu a:focus {
-    color: var(--nav-dropdown-color);
-    padding: 10px 20px;
-    font-family: var(--nav-font);
-    font-size: 17px;
+    color: #e8f6f6;
+    padding: 14px 24px;
+    font-size: 16px;
     font-weight: 500;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    white-space: nowrap;
-    transition: 0.3s;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
+  .navmenu a:hover,
+  .navmenu .active,
+  .navmenu .active:focus {
+    color: #00cccc;              /* your teal accent */
   }
 
   .navmenu a i,
   .navmenu a:focus i {
     font-size: 12px;
-    line-height: 0;
     margin-left: 5px;
     width: 30px;
     height: 30px;
@@ -607,74 +615,36 @@ input:focus, textarea:focus {
     align-items: center;
     justify-content: center;
     border-radius: 50%;
+    background-color: rgba(0, 153, 153, 0.12);
     transition: 0.3s;
-    background-color: color-mix(in srgb, var(--accent-color), transparent 90%);
-  }
-
-  .navmenu a i:hover,
-  .navmenu a:focus i:hover {
-    background-color: var(--accent-color);
-    color: var(--contrast-color);
-  }
-
-  .navmenu a:hover,
-  .navmenu .active,
-  .navmenu .active:focus {
-    color: var(--nav-dropdown-hover-color);
   }
 
   .navmenu .active i,
   .navmenu .active:focus i {
-    background-color: var(--accent-color);
-    color: var(--contrast-color);
+    background-color: #00cccc;
+    color: #0d1b1e;
     transform: rotate(180deg);
   }
 
-  .navmenu .dropdown ul {
-    position: static;
-    display: none;
-    z-index: 99;
-    padding: 10px 0;
-    margin: 10px 20px;
-    background-color: var(--nav-dropdown-background-color);
-    border: 1px solid color-mix(in srgb, var(--default-color), transparent 90%);
-    box-shadow: none;
-    transition: all 0.5s ease-in-out;
-  }
-
-  .navmenu .dropdown ul ul {
-    background-color: rgba(33, 37, 41, 0.1);
-  }
-
-  .navmenu .dropdown>.dropdown-active {
-    display: block;
-    background-color: rgba(33, 37, 41, 0.03);
-  }
-
-  .mobile-nav-active {
-    overflow: hidden;
+  .mobile-nav-toggle {
+    color: #00cccc;
+    font-size: 28px;
+    line-height: 0;
+    cursor: pointer;
+    transition: color 0.3s;
+    z-index: 9999;
+    position: relative;
   }
 
   .mobile-nav-active .mobile-nav-toggle {
     color: #fff;
-    position: absolute;
-    font-size: 32px;
-    top: 15px;
-    right: 15px;
-    margin-right: 0;
-    z-index: 9999;
-  }
-
-  .mobile-nav-active .navmenu {
     position: fixed;
-    overflow: hidden;
-    inset: 0;
-    background: rgba(33, 37, 41, 0.8);
-    transition: 0.3s;
+    top: 20px;
+    right: 20px;
   }
 
-  .mobile-nav-active .navmenu>ul {
-    display: block;
+  .mobile-nav-active {
+    overflow: hidden;            /* lock background scroll while menu is open */
   }
 }
 
