@@ -613,11 +613,30 @@ Our mission is to help you regain confidence in your body and get back to doing 
                 </div>
               </div>
               <div class="col-md-6">
-                <div class="form-field">
-                  <input type="date" name="preferred_date" class="form-input" id="preferredDate" required>
-                  <label for="preferredDate" class="field-label">Preferred Date</label>
-                </div>
-              </div>
+  <div class="form-field">
+    <input type="date" name="preferred_date" class="form-input" id="preferredDate" required>
+    <label for="preferredDate" class="field-label">Preferred Date</label>
+  </div>
+</div>
+
+<div class="col-md-6">
+  <div class="form-field">
+    <select name="preferred_time" class="form-input" id="preferredTime" required>
+      <option value="" disabled selected>Select a time</option>
+      <option value="08:00">08:00 AM</option>
+      <option value="09:00">09:00 AM</option>
+      <option value="10:00">10:00 AM</option>
+      <option value="11:00">11:00 AM</option>
+      <option value="12:00">12:00 PM</option>
+      <option value="13:00">01:00 PM</option>
+      <option value="14:00">02:00 PM</option>
+      <option value="15:00">03:00 PM</option>
+      <option value="16:00">04:00 PM</option>
+      <option value="17:00">05:00 PM</option>
+    </select>
+    <label for="preferredTime" class="field-label">Preferred Time</label>
+  </div>
+</div>
             </div>
 
             <div class="form-field message-field">
@@ -662,17 +681,7 @@ Our mission is to help you regain confidence in your body and get back to doing 
 </a>
 
 			
-			<a href="https://www.google.com/maps/search/?api=1&query=483+Chelsea+Crescent,+Lenasia+South,+Ext+1" 
-   target="_blank" 
-   class="contact-method" 
-   data-aos="fade-in" 
-   data-aos-delay="350">
-  <div class="contact-icon"><i class="bi bi-geo-alt"></i></div>
-  <div class="contact-details">
-    <span class="method-label">Home Address</span>
-    <p>483 Chelsea Crescent, Lenasia South, Ext 1</p>
-  </div>
-</a>
+			
 
 			
 
@@ -771,16 +780,7 @@ Our mission is to help you regain confidence in your body and get back to doing 
   </div>
 </a>
 
-<a href="https://www.google.com/maps/search/?api=1&query=483+Chelsea+Crescent,+Lenasia+South,+Ext+1" 
-   target="_blank" 
-   class="contact-item" 
-   data-aos="fade-in" 
-   data-aos-delay="350">
-  <div class="contact-icon"><i class="bi bi-geo-alt"></i></div>
-  <div class="contact-info">
-    <p>483 Chelsea Crescent, Lenasia South, Ext 1</p>
-  </div>
-</a>
+
 
           <a href="tel:+27810230303" class="contact-item" data-aos="fade-in" data-aos-delay="450">
   <div class="contact-icon"><i class="bi bi-telephone"></i></div>
@@ -828,6 +828,50 @@ Our mission is to help you regain confidence in your body and get back to doing 
 </footer><!-- /Footer -->
 
  <script>
+ 
+ //google calendar
+document.getElementById("bookingForm").addEventListener("submit", async function (e) {
+  e.preventDefault();
+
+  const submitBtn = this.querySelector(".send-button");
+  const originalHTML = submitBtn.innerHTML;
+  submitBtn.disabled = true;
+  submitBtn.innerHTML = "Booking...";
+
+  const payload = {
+    name: this.querySelector("[name=full_name]").value,
+    email: this.querySelector("[name=email]").value,
+    phone: this.querySelector("[name=phone]").value,
+    date: this.querySelector("[name=preferred_date]").value,
+    time: this.querySelector("[name=preferred_time]").value,
+    notes: this.querySelector("[name=notes]")?.value || ""
+  };
+
+  const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyRDJTd5WxjEblAewnCu9n2CcniI9_uhuT_2rGxKsD2daAtnIVnMpQMHo9ZXv93dR4utA/exec";
+
+  try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 5000); // never wait more than 5s
+
+    await fetch(APPS_SCRIPT_URL, {
+      method: "POST",
+      mode: "no-cors",           // stops the CORS/redirect hang
+      body: JSON.stringify(payload),
+      headers: { "Content-Type": "text/plain" },
+      signal: controller.signal
+    });
+
+    clearTimeout(timeout);
+  } catch (err) {
+    console.warn("Calendar booking failed or timed out, continuing anyway.", err);
+  }
+
+  submitBtn.innerHTML = originalHTML;
+  this.submit(); // now actually continue on to FormSubmit
+});
+
+ 
+ 
 document.addEventListener("DOMContentLoaded", function() {
   const form = document.querySelector(".php-email-form");
   const loading = form.querySelector(".loading");
