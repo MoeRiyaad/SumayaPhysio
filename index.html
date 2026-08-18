@@ -872,12 +872,12 @@ document.getElementById("bookingForm").addEventListener("submit", async function
 
     if (!res.ok) throw new Error("FormSubmit request failed");
 
-    loadingEl.style.display = "none";
-    sentEl.style.display = "block";
+    loadingEl.style.setProperty("display", "none", "important");
+    sentEl.style.setProperty("display", "block", "important");
     form.reset();
   } catch (err) {
-    loadingEl.style.display = "none";
-    errorEl.style.display = "block";
+    loadingEl.style.setProperty("display", "none", "important");
+    errorEl.style.setProperty("display", "block", "important");
   } finally {
     submitBtn.disabled = false;
   }
