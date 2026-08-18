@@ -842,7 +842,7 @@ Our mission is to help you regain confidence in your body and get back to doing 
 
  <script>
  //grey out booked options
- async function checkAvailability() {
+async function checkAvailability() {
   const selectedDate = document.getElementById("preferredDate").value;
   const durationValue = document.getElementById("treatmentDuration").value;
   const timeSelect = document.getElementById("preferredTime");
@@ -854,7 +854,12 @@ Our mission is to help you regain confidence in your body and get back to doing 
   }
 
   const duration = parseInt(durationValue);
-  timeSelect.disabled = false;
+
+  // Lock the dropdown and show a loading state while we fetch
+  timeSelect.disabled = true;
+  const originalFirstOption = timeSelect.options[0];
+  const loadingText = originalFirstOption.textContent;
+  originalFirstOption.textContent = "Checking availability...";
 
   Array.from(timeSelect.options).forEach(opt => {
     opt.disabled = false;
@@ -884,6 +889,9 @@ Our mission is to help you regain confidence in your body and get back to doing 
     });
   } catch (err) {
     console.warn("Could not check availability:", err);
+  } finally {
+    originalFirstOption.textContent = loadingText; // restore placeholder text
+    timeSelect.disabled = false; // unlock now that we know the real state
   }
 }
 
@@ -894,6 +902,7 @@ function toMinutes(hhmm) {
 
 document.getElementById("preferredDate").addEventListener("change", checkAvailability);
 document.getElementById("treatmentDuration").addEventListener("change", checkAvailability);
+
 
  //google calendar
 document.getElementById("bookingForm").addEventListener("submit", async function (e) {
