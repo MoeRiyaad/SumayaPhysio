@@ -289,7 +289,7 @@
   }
 
 // Attach to both .email and .contact-method links
-document.querySelectorAll('.email, .contact-method, .contact-item').forEach(link => {
+document.querySelectorAll('.email, .contact-method-email, .contact-item-email').forEach(link => {
   link.addEventListener('click', function(e) {
     e.preventDefault();
     openEmail();
