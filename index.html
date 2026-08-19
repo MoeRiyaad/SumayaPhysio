@@ -583,11 +583,10 @@ Our mission is to help you regain confidence in your body and get back to doing 
             <p>Please provide your details and preferred time. Our team will confirm your booking via email.</p>
           </div>
 
-          <form id="bookingForm" action="https://formsubmit.co/24ff2d67bdb9400f946a9e74f6659046" method="POST" class="php-email-form contact-form">
+          <form id="bookingForm" class="php-email-form contact-form">
             <!-- Redirect back to page with success flag -->
             <!-- Honeypot + Captcha -->
-			<input type="text" name="_honey" style="display:none">
-            <input type="hidden" name="_captcha" value="false">
+			
 
             <div class="row">
               <div class="col-md-6">
@@ -907,15 +906,14 @@ document.getElementById("treatmentDuration").addEventListener("change", checkAva
  //google calendar
 document.getElementById("bookingForm").addEventListener("submit", async function (e) {
   e.preventDefault();
-
   const form = this;
   const loadingEl = form.querySelector(".loading");
   const errorEl = form.querySelector(".error-message");
   const sentEl = form.querySelector(".sent-message");
   const submitBtn = form.querySelector(".send-button");
 
-  [loadingEl, errorEl, sentEl].forEach(el => el.style.display = "none");
-  loadingEl.style.display = "block";
+  [loadingEl, errorEl, sentEl].forEach(el => el.style.setProperty("display", "none", "important"));
+  loadingEl.style.setProperty("display", "block", "important");
   submitBtn.disabled = true;
 
   const payload = {
@@ -924,28 +922,20 @@ document.getElementById("bookingForm").addEventListener("submit", async function
     phone: form.querySelector("[name=phone]").value,
     date: form.querySelector("[name=preferred_date]").value,
     time: form.querySelector("[name=preferred_time]").value,
+    duration: form.querySelector("[name=duration]").value,
     notes: form.querySelector("[name=message]").value
   };
 
-  const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxgGwfrD_HOBXan0gF5bDV1bWzWvGHUo6hGLJNMNkFvNGhDYvJAoHMarXYrod1AYEnZLA/exec";
-  const FORMSUBMIT_AJAX_URL = "https://formsubmit.co/ajax/24ff2d67bdb9400f946a9e74f6659046";
+  // PASTE your correct, current Web app deployment URL here
+  const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyRDJTd5WxjEblAewnCu9n2CcniI9_uhuT_2rGxKsD2daAtnIVnMpQMHo9ZXv93dR4utA/exec";
 
   try {
-    // fire calendar booking, don't let it block the email send
-    fetch(APPS_SCRIPT_URL, {
+    await fetch(APPS_SCRIPT_URL, {
       method: "POST",
       mode: "no-cors",
       body: JSON.stringify(payload),
       headers: { "Content-Type": "text/plain" }
-    }).catch(err => console.warn("Calendar booking failed:", err));
-
-    const res = await fetch(FORMSUBMIT_AJAX_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "Accept": "application/json" },
-      body: JSON.stringify(payload)
     });
-
-    if (!res.ok) throw new Error("FormSubmit request failed");
 
     loadingEl.style.setProperty("display", "none", "important");
     sentEl.style.setProperty("display", "block", "important");
