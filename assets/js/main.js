@@ -288,12 +288,14 @@
     }
   }
 
-  const emailLink = document.querySelector('.email');
-  if (emailLink) {
-    emailLink.addEventListener('click', function(e) {
-      e.preventDefault();
-      openEmail();
-    });
-  }
+// Attach to both .email and .contact-method links
+document.querySelectorAll('.email, .contact-method, .contact-item').forEach(link => {
+  link.addEventListener('click', function(e) {
+    e.preventDefault();
+    openEmail();
+  });
+});
+  
+ 
 
 })();
