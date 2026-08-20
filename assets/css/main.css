@@ -244,6 +244,12 @@ input:focus, textarea:focus {
   color: #1a3c57;
 }
 
+/* Default desktop/tablet layout stays side by side */
+.hero .row {
+  display: flex;
+  flex-wrap: wrap;
+}
+
 
 /*--------------------------------------------------------------
 # About Section
@@ -1605,7 +1611,8 @@ section,
 
 @media (max-width: 576px) {
   .about {
-    padding: 60px 0;
+	  padding-top: 2px;
+    
   }
 }
 
