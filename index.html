@@ -815,7 +815,55 @@ document.getElementById("bookingForm").addEventListener("submit", async function
   }
 });
 
- 
+ document.addEventListener("DOMContentLoaded", function () {
+  const dateInput = document.getElementById("preferredDate");
+  const timeSelect = document.getElementById("preferredTime");
+
+  // Allow today onwards (remove the "+1" if you want same-day bookings allowed)
+  const today = new Date();
+  dateInput.min = today.toISOString().split("T")[0];
+
+  dateInput.addEventListener("input", function () {
+    if (!this.value) return;
+
+    const selectedDate = new Date(this.value + "T00:00:00");
+    const day = selectedDate.getDay();
+
+    if (day === 0 || day === 6) {
+      alert("We're closed on weekends. Please select a weekday (Mon–Fri).");
+      this.value = "";
+      return;
+    }
+
+    blockPastTimesIfToday(this.value);
+  });
+
+  function blockPastTimesIfToday(selectedDateStr) {
+    const now = new Date();
+    const todayStr = now.toISOString().split("T")[0];
+
+    Array.from(timeSelect.options).forEach(opt => {
+      if (!opt.value) return;
+      opt.disabled = false;
+      opt.textContent = opt.textContent.replace(" (Past)", "");
+    });
+
+    if (selectedDateStr !== todayStr) return; // only restrict for today
+
+    const currentMinutes = now.getHours() * 60 + now.getMinutes();
+
+    Array.from(timeSelect.options).forEach(opt => {
+      if (!opt.value) return;
+      const [h, m] = opt.value.split(":").map(Number);
+      const slotMinutes = h * 60 + m;
+
+      if (slotMinutes <= currentMinutes) {
+        opt.disabled = true;
+        opt.textContent += " (Past)";
+      }
+    });
+  }
+});
  
 document.addEventListener("DOMContentLoaded", function() {
   const form = document.querySelector(".php-email-form");
